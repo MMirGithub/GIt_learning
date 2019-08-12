@@ -1,32 +1,51 @@
 #!/usr/bin/env python3
 import  os
 import time
+import datetime
+
+coef = 20
+username = "iamvee"
+repo = "mahmood"
 
 
+pattern = """
+..9...................99...........................
+..9...................99...........................
+..9...................99...........................
+..9.999......9999.9...99...........................
+..99..99....99...9.................................
+..99...99...99...99...99...........................
+..99...99....9999.99..99...........................
+"""
 os.system("git init")
 
-with open('pattern') as f:
-    lines = f.read().replace('.', '0').replace('#', '9').split('\n')
-    arr = [[int(c) for c in line] for line in lines if line]
 
-arrx = [[arr[i][j] for i in range(len(arr))] for j in range(len(arr[0]))][::-1]
+
+lines = pattern.replace('.', '0').split('\n')
+arr = [[int(c) for c in line] for line in lines if line]
+
+a, b = len(arr), len(arr[0])
+arrx = [[arr[i][j] for i in range(a)] for j in range(b)]
+arrx = arrx[::-1]
 
 now = time.time()
+weekday = datetime.datetime.now().weekday()
 
 for i, x in enumerate(arrx):
     for j, y in enumerate(x):
-        for yy in range(y):
-            tx = now -  24*3600 * (i*7+j) - yy
+        for yy in range(coef * y):
+            tx = now -  24*3600 * (i*7-j+weekday-1) - yy
+            os.system(f"echo {tx} >> file")
             os.system(f"""
-echo . >> file
 git add .
 git commit -m "test $i"
-GIT_COMMITTER_DATE="`date --date=@{tx} `"
+GIT_COMMITTER_DATE="`date --date=@{tx}`"
 git commit --amend --no-edit --date "`date --date=@{tx}`"
 """)
             
 
-os.system("""
-git remote add origin git@github.com:MMirGithub/GIt_learning.git
+os.system(f"""
+git remote add origin git@github.com:{username}/{repo}.git
 git push -u origin master
 """)    
+
